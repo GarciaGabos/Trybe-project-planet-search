@@ -5,15 +5,23 @@ import fetchPlanets from '../fetchPlanets/fetchPlanets';
 
 function StarWarsProvider({ children }) {
   const [planets, setPlanets] = useState([]);
+  const [searchName, setSearchName] = useState('');
 
   useEffect(() => {
     fetchPlanets().then((data) => setPlanets(data));
   }, []);
 
   const planetState = { planets, setPlanets };
+  // const searchNameState = { searchName, setSearchName };
+  const searchNameState = {
+    filters: {
+      searchName,
+    },
+    setSearchName,
+  };
 
   return (
-    <StarWarsContext.Provider value={ planetState }>
+    <StarWarsContext.Provider value={ { planetState, searchNameState } }>
       {children}
     </StarWarsContext.Provider>
   );
