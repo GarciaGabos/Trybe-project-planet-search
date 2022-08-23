@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
 
 function Table() {
@@ -6,6 +6,25 @@ function Table() {
   const { searchNameState: { filters: { searchName },
     setSearchName } } = useContext(StarWarsContext);
 
+  const { filterState:
+    { filterByNumericValues, setFilterByNumericValues } } = useContext(StarWarsContext);
+
+  const [filter, setFilter] = useState({
+    column: 'population',
+    comparison: 'maior que',
+    value: '0',
+  });
+
+  // const sendFilter = () => {
+  //   const filterArray = searchFilters;
+  // };
+
+  const onInputChange = ({ target }) => {
+    const { name, value } = target;
+    setFilter({ ...filter, [name]: value });
+  };
+
+  console.log(filterByNumericValues);
   return (
     <>
       <input
@@ -15,6 +34,41 @@ function Table() {
         value={ searchName }
         onChange={ (event) => setSearchName(event.target.value) }
       />
+      <label htmlFor="column-filter">
+        Filtrar por:
+        <select
+          data-testid="column-filter"
+          name="column"
+          // value={ cardRare }
+          onChange={ onInputChange }
+        >
+          <option value="population">Population</option>
+          <option value="orbital_period">Orbital period</option>
+          <option value="diameter">Diameter</option>
+          <option value="rotation_period">Rotation period</option>
+          <option value="surface_water">Surface Water</option>
+        </select>
+      </label>
+      <label htmlFor="comparison-filter">
+        <select
+          data-testid="comparison-filter"
+          name="comparison"
+          // value={ cardRare }
+          onChange={ onInputChange }
+        >
+          <option value="maior que">maior que</option>
+          <option value="menor que">menor que</option>
+          <option value="igual">igual</option>
+        </select>
+      </label>
+      <input type="number" name="value" onChange={ onInputChange } />
+      <button
+        type="button"
+        onClick={ () => setFilterByNumericValues([...filterByNumericValues, filter]) }
+      >
+        Filter Search
+
+      </button>
       <table>
         <thead>
           <tr>
@@ -36,6 +90,15 @@ function Table() {
         <tbody>
           {planets
             .filter((planet) => planet.name.includes(searchName))
+            .filter((planet) => filterByNumericValues
+              .every(({ column, comparison, value }) => {
+                if (comparison === 'menor que') {
+                  return +planet[column] < +value;
+                } if (comparison === 'maior que') {
+                  return +planet[column] > +value;
+                }
+                return +planet[column] === +value;
+              }))
             .map((planet) => (
               <tr key={ planet.name }>
                 <td>{planet.name}</td>
