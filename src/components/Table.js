@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import StarWarsContext from '../context/StarWarsContext';
 
 function Table() {
@@ -18,15 +18,32 @@ function Table() {
   // const sendFilter = () => {
   //   const filterArray = searchFilters;
   // };
+  console.log(planets);
+
+  const Columnfilter = [
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ];
+
+  const collumFilterForDiferenc = Columnfilter.filter(
+    (column) => !filterByNumericValues.some((e) => column === e.column),
+  );
+
+  useEffect(() => {
+    setFilter((p) => ({ ...p, column: collumFilterForDiferenc[0] }));
+  }, [filterByNumericValues]);
 
   const onInputChange = ({ target }) => {
     const { name } = target;
     setFilter({ ...filter, [name]: target.value });
   };
 
-  console.log(filterByNumericValues);
   return (
     <>
+      <h1>Star Wars Planets Info</h1>
       <input
         type="text"
         data-testid="name-filter"
@@ -42,11 +59,11 @@ function Table() {
           value={ filter.column }
           onChange={ onInputChange }
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          {collumFilterForDiferenc.map((collumn) => (
+            <option key={ collumn } value={ collumn }>
+              {collumn}
+            </option>
+          ))}
         </select>
       </label>
       <label htmlFor="comparison-filter">
